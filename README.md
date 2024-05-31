@@ -1,1 +1,3 @@
-# MyFirstWebAppImage
+Este proyecto siguen en construcción. Este pryecto esta enfocado en la venta de productos, en este caso soy fotografo y la idea principal es vender mis productos (imagenes). Ademas de esto se planea dejar un mejor registro para indentificar haciendo analisis de datos de donde se comercializa más el producto para llevar esto a un entorno industrial y porductivo. Cómo plus aun esta en creación un diagrama o arquitectura si se desea llevar a AWS. 
+El server se encuntra el back, esta construido en Nodejs, en el archivo de env se encuentran los parametros para que se cree la base de datos. 
+En el front se encuntra la parte grafica, la cual esta desarrollada en Angular. 
