@@ -1,0 +1,24 @@
+
+<div class="wrapper">
+    <div class="body">
+        <img class="logo" src="../../../assets/img/login.png" alt="">
+    <h3>User registry</h3>
+    <div class="form-floating mb-3 mt-3">
+        <input type="text" [(ngModel)]="username" class="form-control" placeholder="singIn user">
+        <label >User</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="password" [(ngModel)]="password" class="form-control" placeholder="singIn password">
+    <label >Password</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="password" [(ngModel)]="confirmPassword" class="form-control" placeholder="singIn password again">
+    <label >Repeat Password</label>
+    </div>
+    <div class="d-grid gap-2 mb-3">
+        <button type="button" (click)="addUser()" class="btn btn-outline-secondary">Enter</button>
+    </div>
+    <div>
+    <a routerLink="/login">Back</a>
+    </div>
+</div>

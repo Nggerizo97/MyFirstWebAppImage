@@ -1,0 +1,27 @@
+<app-navbar></app-navbar>
+<div class="container-fluid">
+    <h3>Productos</h3>
+    <!-- Catálogo de imágenes -->
+    <div class="image-catalog">
+      <div *ngFor="let image of images" class="image-item">
+          <img [src]="image.url" alt="Imagen de venta" (click)="selectImage(image)">
+          <input type="number" [(ngModel)]="image.customPrice" placeholder="Price" [disabled]="image.isAddedToCart">
+          <button class="btn-add" (click)="addToCart(image)">Add to shopping-cart</button>
+      </div>
+  </div>
+
+    <!-- Carrito de compras -->
+    <div class="shopping-cart">
+      <h2>shopping-cart</h2>
+      <ul>
+          <li *ngFor="let item of cartItems; let i = index">
+            {{ item.name }} - {{ item.customPrice | currency:'USD':'symbol' }} x {{ item.quantity }} = {{ item.quantity * item.customPrice | currency:'USD':'symbol' }}
+              <button class="btn-remove" (click)="removeFromCart(i)">Delete</button>
+          </li>
+      </ul>
+      <p>Total: {{ getTotal() | currency:'USD':'symbol' }}</p>
+      <p>Total Quantity: {{ getTotalQuantity() }}</p>
+      <button class="btn-complete" (click)="checkout()">Finish Your Purchase</button>
+  </div>
+</div>
+
