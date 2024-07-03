@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -14,6 +15,7 @@ export class SignInComponent implements OnInit{
   username: string = "";
   password: string = "";
   confirmPassword: string = "";
+  loading: boolean = false;
 
   constructor(private toastr: ToastrService, 
     private _userService: UserService,
@@ -45,12 +47,24 @@ addUser() {
     password: this.password
   }
 
-  this._userService.singIn(user).subscribe(data =>{
-    console.log("User create successfully");
-    this.toastr.success("User added successfully", "Success")
-    this.router.navigate(['/login'])
+  this.loading = true;
+  this._userService.singIn(user).subscribe({
+    next: (v) => {
+      this.loading = false;
+      console.log("User create successfully");
+      this.toastr.success("User added successfully", "Success")
+      this.router.navigate(['/login'])},
+    error: (events:HttpErrorResponse) => {
+      this.loading = false
+    if(events.error.msg){
+      this.toastr.error(events.error.msg, "Error")
+    } else {
+      this.toastr.error("Oops an error has occurred", "Error")
+    }
+    console.log(events)
+    },
+    complete: () => console.info('complete')
   })
-
 }
 
 

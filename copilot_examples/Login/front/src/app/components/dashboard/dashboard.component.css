@@ -1,3 +1,11 @@
+/* CSS Variables */
+:root {
+  --primary-color: #007BFF;
+  --primary-hover-color: #0056b3;
+  --secondary-color: #dc3545;
+  --secondary-hover-color: #c82333;
+}
+
 /* General Styles */
 body {
   font-family: Arial, sans-serif;
@@ -11,10 +19,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 1200px; /* Limit the width of the container */
+  margin: auto; /* Center the container */
 }
 
 h3 {
   color: #333;
+  font-size: 1.5em; /* Increase the font size */
 }
 
 .image-catalog {
@@ -35,6 +46,11 @@ h3 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 200px;
   text-align: center;
+  transition: box-shadow 0.3s; /* Add transition for hover effect */
+}
+
+.image-item:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Add hover effect */
 }
 
 .image-item img {
@@ -52,8 +68,9 @@ h3 {
   text-align: center;
 }
 
-.btn-add, .btn-complete, .btn-remove {
-  background-color: #007BFF;
+/* General button styles */
+.btn {
+  background-color: var(--primary-color);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -62,16 +79,17 @@ h3 {
   transition: background-color 0.3s;
 }
 
-.btn-add:hover, .btn-complete:hover, .btn-remove:hover {
-  background-color: #0056b3;
+.btn:hover {
+  background-color: var(--primary-hover-color);
 }
 
+/* Specific button styles */
 .btn-remove {
-  background-color: #dc3545;
+  background-color: var(--secondary-color);
 }
 
 .btn-remove:hover {
-  background-color: #c82333;
+  background-color: var(--secondary-hover-color);
 }
 
 .shopping-cart {
@@ -103,4 +121,3 @@ h3 {
   justify-content: space-between;
   align-items: center;
 }
-

@@ -1,0 +1,6 @@
+{
+    "editor.defaultFormatter": "Bito.Bito",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}
