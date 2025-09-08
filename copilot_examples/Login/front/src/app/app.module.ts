@@ -8,6 +8,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SpinnerComponent } from './shared/spinner/spinner.component';
 import { MywebpageComponent } from './components/mywebpage/mywebpage.component';
+import { OrdersComponent } from './components/orders/orders.component';
 import { FormsModule } from '@angular/forms'; 
 import { HttpClientModule } from "@angular/common/http"
 import { ToastrModule } from 'ngx-toastr';
@@ -21,7 +22,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DashboardComponent,
     NavbarComponent,
     SpinnerComponent,
-    MywebpageComponent
+    MywebpageComponent,
+    OrdersComponent
   ],
   imports: [
     BrowserModule,

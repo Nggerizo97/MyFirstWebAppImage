@@ -5,6 +5,11 @@
     </a>
     
     <div class="navbar-nav ms-auto">
+      <!-- Orders Link -->
+      <button *ngIf="isAuthenticated" class="btn btn-outline-info me-2" type="button" routerLink="/orders">
+        📋 My Orders
+      </button>
+      
       <!-- Cart Button -->
       <button *ngIf="isAuthenticated" class="btn btn-outline-primary me-2" type="button">
         🛒 Cart ({{ cartItemCount }})

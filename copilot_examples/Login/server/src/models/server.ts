@@ -2,6 +2,7 @@ import express from 'express';
 import routesProduct from '../routes/product';
 import routesUsers from '../routes/user';
 import routesOrder from '../routes/order';
+import routesPayment from '../routes/payment';
 import { Request, Response, NextFunction } from 'express';
 import  cors  from 'cors';
 import { Product } from './products';
@@ -32,6 +33,7 @@ class Server {
         this.app.use('/api/user', routesUsers);
         this.app.use('/api/product', routesProduct);
         this.app.use('/api/order', routesOrder);
+        this.app.use('/api/payment', routesPayment);
         
     }
 
@@ -56,11 +58,24 @@ class Server {
         Product.sync({ force: false });
         Order.sync({ force: false });
         
+        // Set up associations
+        this.setupAssociations();
+        
         // Seed sample data
         setTimeout(async () => {
             const { seedProducts } = await import('../utils/seedData');
             await seedProducts();
         }, 2000);
+    }
+
+    setupAssociations() {
+        // User has many Orders
+        User.hasMany(Order, { foreignKey: 'userId', as: 'orders' });
+        Order.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+        
+        // Product has many Orders  
+        Product.hasMany(Order, { foreignKey: 'productId', as: 'orders' });
+        Order.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
     }
       
 }

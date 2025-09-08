@@ -66,4 +66,16 @@ export class ProductService {
     const body = { status, paymentId };
     return this.http.put(`${this.myAppUrl}api/order/${orderId}/status`, body, { headers });
   }
+
+  processPayment(orderId: number, paymentMethod: string = 'test'): Observable<any> {
+    const headers = this.getAuthHeaders();
+    const body = { orderId, paymentMethod };
+    return this.http.post(`${this.myAppUrl}api/payment/process`, body, { headers });
+  }
+
+  createPaymentIntent(amount: number, currency: string = 'usd'): Observable<any> {
+    const headers = this.getAuthHeaders();
+    const body = { amount, currency };
+    return this.http.post(`${this.myAppUrl}api/payment/create-intent`, body, { headers });
+  }
 }

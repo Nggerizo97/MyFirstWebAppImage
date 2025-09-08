@@ -121,27 +121,65 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
+    this.toastr.info('Processing your orders...', 'Please wait');
+
     // Process each item as a separate order
     let completedOrders = 0;
+    let failedOrders = 0;
     const totalOrders = this.cartItems.length;
+    const createdOrders: any[] = [];
 
     this.cartItems.forEach((item, index) => {
       this.productService.createOrder(item.productId, item.customPrice, 'test').subscribe({
         next: (response) => {
-          completedOrders++;
-          
-          if (completedOrders === totalOrders) {
-            this.toastr.success('All orders created successfully!', 'Success');
-            this.cartItems = [];
-            this.saveCart();
-          }
+          // Order created, now process payment
+          this.productService.processPayment(response.order.id, 'test').subscribe({
+            next: (paymentResponse) => {
+              completedOrders++;
+              createdOrders.push(paymentResponse.order);
+              
+              if (completedOrders + failedOrders === totalOrders) {
+                this.handleCheckoutComplete(completedOrders, failedOrders, totalOrders);
+              }
+            },
+            error: (paymentError) => {
+              failedOrders++;
+              console.error('Payment error:', paymentError);
+              this.toastr.error(`Payment failed for ${item.name}`, 'Payment Error');
+              
+              if (completedOrders + failedOrders === totalOrders) {
+                this.handleCheckoutComplete(completedOrders, failedOrders, totalOrders);
+              }
+            }
+          });
         },
         error: (error) => {
+          failedOrders++;
           console.error('Error creating order:', error);
           this.toastr.error(`Error creating order for ${item.name}`, 'Error');
+          
+          if (completedOrders + failedOrders === totalOrders) {
+            this.handleCheckoutComplete(completedOrders, failedOrders, totalOrders);
+          }
         }
       });
     });
+  }
+
+  private handleCheckoutComplete(completed: number, failed: number, total: number): void {
+    if (completed > 0) {
+      if (failed === 0) {
+        this.toastr.success(`All ${total} orders completed successfully!`, 'Success');
+      } else {
+        this.toastr.warning(`${completed} orders completed, ${failed} failed`, 'Partial Success');
+      }
+      
+      // Clear cart on any success
+      this.cartItems = [];
+      this.saveCart();
+    } else {
+      this.toastr.error('All orders failed. Please try again.', 'Error');
+    }
   }
 
   selectImage(image: Product): void {

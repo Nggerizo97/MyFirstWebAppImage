@@ -1,0 +1,118 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>📋 Order History</h2>
+      <p class="text-muted">Your purchased images and order details</p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading your orders...</p>
+  </div>
+
+  <!-- No Orders -->
+  <div *ngIf="!loading && orders.length === 0" class="text-center py-5">
+    <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+    <h4>No Orders Found</h4>
+    <p class="text-muted">You haven't made any purchases yet.</p>
+    <a routerLink="/gallery" class="btn btn-primary">Browse Gallery</a>
+  </div>
+
+  <!-- Orders List -->
+  <div *ngIf="!loading && orders.length > 0" class="row">
+    <div class="col-12">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Image</th>
+              <th>Details</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Payment ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>
+                <img *ngIf="order.product?.imageUrl" 
+                     [src]="order.product?.imageUrl" 
+                     [alt]="order.product?.name"
+                     class="img-thumbnail order-image">
+                <div *ngIf="!order.product?.imageUrl" class="placeholder-image">
+                  No Image
+                </div>
+              </td>
+              <td>
+                <h6 class="mb-1">{{ order.product?.name || 'Unknown Product' }}</h6>
+                <small class="text-muted">{{ order.product?.description }}</small>
+                <br>
+                <small class="text-muted">Order #{{ order.id }}</small>
+              </td>
+              <td>
+                <strong class="text-success">${{ order.amount.toFixed(2) }}</strong>
+              </td>
+              <td>
+                <span [class]="getStatusBadgeClass(order.status)">
+                  {{ order.status | titlecase }}
+                </span>
+              </td>
+              <td>
+                <small>{{ formatDate(order.createdAt!) }}</small>
+              </td>
+              <td>
+                <small class="text-muted font-monospace">
+                  {{ order.paymentId || 'N/A' }}
+                </small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Summary -->
+  <div *ngIf="!loading && orders.length > 0" class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Order Summary</h5>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-primary">{{ orders.length }}</h4>
+                <small class="text-muted">Total Orders</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-success">{{ getPaidOrdersCount() }}</h4>
+                <small class="text-muted">Paid</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-warning">{{ getPendingOrdersCount() }}</h4>
+                <small class="text-muted">Pending</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-success">${{ getTotalSpent().toFixed(2) }}</h4>
+                <small class="text-muted">Total Spent</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

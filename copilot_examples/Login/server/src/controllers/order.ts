@@ -58,7 +58,8 @@ export const getOrders = async (req: Request, res: Response) => {
       where: { userId: user.id },
       include: [{
         model: Product,
-        as: 'product'
+        as: 'product',
+        attributes: ['id', 'name', 'description', 'imageUrl', 'category']
       }],
       order: [['createdAt', 'DESC']]
     });

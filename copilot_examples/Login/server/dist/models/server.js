@@ -49,6 +49,7 @@ const express_1 = __importDefault(require("express"));
 const product_1 = __importDefault(require("../routes/product"));
 const user_1 = __importDefault(require("../routes/user"));
 const order_1 = __importDefault(require("../routes/order"));
+const payment_1 = __importDefault(require("../routes/payment"));
 const cors_1 = __importDefault(require("cors"));
 const products_1 = require("./products");
 const user_2 = require("./user");
@@ -72,6 +73,7 @@ class Server {
         this.app.use('/api/user', user_1.default);
         this.app.use('/api/product', product_1.default);
         this.app.use('/api/order', order_1.default);
+        this.app.use('/api/payment', payment_1.default);
     }
     middlewares() {
         this.app.use(express_1.default.static('public'));
@@ -91,11 +93,21 @@ class Server {
         user_2.User.sync({ force: false });
         products_1.Product.sync({ force: false });
         order_2.Order.sync({ force: false });
+        // Set up associations
+        this.setupAssociations();
         // Seed sample data
         setTimeout(() => __awaiter(this, void 0, void 0, function* () {
             const { seedProducts } = yield Promise.resolve().then(() => __importStar(require('../utils/seedData')));
             yield seedProducts();
         }), 2000);
+    }
+    setupAssociations() {
+        // User has many Orders
+        user_2.User.hasMany(order_2.Order, { foreignKey: 'userId', as: 'orders' });
+        order_2.Order.belongsTo(user_2.User, { foreignKey: 'userId', as: 'user' });
+        // Product has many Orders  
+        products_1.Product.hasMany(order_2.Order, { foreignKey: 'productId', as: 'orders' });
+        order_2.Order.belongsTo(products_1.Product, { foreignKey: 'productId', as: 'product' });
     }
 }
 exports.default = Server;
