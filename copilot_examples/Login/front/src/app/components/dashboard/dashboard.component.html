@@ -1,37 +1,136 @@
 <app-navbar></app-navbar>
-<div class="container-fluid">
-  <h3>Productos</h3>
 
-  <!-- Catálogo de imágenes -->
-  <div class="image-catalog">
-    <div *ngFor="let image of images" class="image-item">
-      <img [src]="image.url" alt="Imagen de venta" (click)="selectImage(image)">
-      <input type="number" [(ngModel)]="image.customPrice" placeholder="Price" [disabled]="image.isAddedToCart">
-      <button class="btn-add" (click)="addToCart(image)">Add to shopping-cart</button>
-      <input type="number" [(ngModel)]="newPrice" placeholder="New Price">
-      <button (click)="updatePrice(image, newPrice)">Actualize Price</button>
-      <input type="number" [(ngModel)]="quantityToRemove" placeholder="Number quantity">
-      <button (click)="removeQuantity(image, quantityToRemove)">Delete quantity</button>
+<div class="container-fluid mt-4">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading images...</p>
+  </div>
+
+  <!-- Gallery Header -->
+  <div *ngIf="!loading" class="row mb-4">
+    <div class="col-md-8">
+      <h2>🎨 Photography Gallery</h2>
+      <p class="text-muted">Discover and purchase beautiful images. Set your own price to support the artist!</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <div *ngIf="cartItems.length > 0" class="alert alert-info">
+        Cart: {{ getTotalQuantity() }} items - ${{ getTotal().toFixed(2) }}
+      </div>
     </div>
   </div>
 
-  <!-- Carrito de compras -->
-  <div class="shopping-cart">
-    <h2>shopping-cart</h2>
-    <ul>
-      <li *ngFor="let item of cartItems; let i = index">
-        {{ item.name }} - {{ item.customPrice | currency:'USD':'symbol' }} x {{ item.quantity }} = {{ item.quantity * item.customPrice | currency:'USD':'symbol' }}
-        <button class="btn-remove" (click)="removeFromCart(i)">Delete</button>
-      </li>
-    </ul>
-    <p>Total: {{ getTotal() | currency:'USD':'symbol' }}</p>
-    <p>Total Quantity: {{ getTotalQuantity() }}</p>
-    <button class="btn-complete" (click)="checkout()">Finish Your Purchase</button>
+  <div *ngIf="!loading" class="row">
+    <!-- Image Gallery -->
+    <div class="col-lg-8">
+      <h3>Available Images</h3>
+      
+      <div *ngIf="images.length === 0" class="text-center py-5">
+        <p class="text-muted">No images available at the moment.</p>
+      </div>
+
+      <div class="row">
+        <div *ngFor="let image of images" class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <img [src]="image.imageUrl" 
+                 class="card-img-top image-preview" 
+                 [alt]="image.name"
+                 (click)="selectImage(image)"
+                 style="height: 200px; object-fit: cover; cursor: pointer;">
+            
+            <div class="card-body">
+              <h5 class="card-title">{{ image.name }}</h5>
+              <p class="card-text text-muted" *ngIf="image.description">
+                {{ image.description }}
+              </p>
+              <p class="card-text">
+                <strong>Base Price: ${{ image.price }}</strong>
+              </p>
+              
+              <!-- Custom Price Input -->
+              <div class="mb-3">
+                <label class="form-label">Your Price (minimum ${{ image.price }})</label>
+                <input type="number" 
+                       class="form-control" 
+                       [value]="image.price"
+                       #customPrice
+                       [min]="image.price"
+                       step="1">
+                <small class="form-text text-muted">Support the artist by paying more!</small>
+              </div>
+              
+              <!-- Add to Cart Button -->
+              <button class="btn btn-primary w-100" 
+                      (click)="addToCart(image, customPrice.value ? +customPrice.value : image.price)">
+                <i class="fas fa-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shopping Cart Sidebar -->
+    <div class="col-lg-4">
+      <div class="card sticky-top">
+        <div class="card-header">
+          <h4>🛒 Shopping Cart</h4>
+        </div>
+        <div class="card-body">
+          <div *ngIf="cartItems.length === 0" class="text-center text-muted py-4">
+            <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+            <p>Your cart is empty</p>
+            <small *ngIf="!isAuthenticated">Login to start shopping!</small>
+          </div>
+
+          <div *ngIf="cartItems.length > 0">
+            <!-- Cart Items -->
+            <div *ngFor="let item of cartItems; let i = index" class="cart-item mb-3 pb-3 border-bottom">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <img [src]="item.imageUrl" 
+                       class="img-fluid rounded" 
+                       [alt]="item.name"
+                       style="height: 60px; object-fit: cover;">
+                </div>
+                <div class="col-6">
+                  <h6 class="mb-1">{{ item.name }}</h6>
+                  <p class="mb-1 text-success">${{ item.customPrice.toFixed(2) }}</p>
+                </div>
+                <div class="col-2">
+                  <button class="btn btn-sm btn-outline-danger" 
+                          (click)="removeFromCart(i)"
+                          title="Remove from cart">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="border-top pt-3">
+              <div class="d-flex justify-content-between mb-2">
+                <span><strong>Total Items:</strong></span>
+                <span>{{ getTotalQuantity() }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-3">
+                <span><strong>Total Amount:</strong></span>
+                <span class="text-success"><strong>${{ getTotal().toFixed(2) }}</strong></span>
+              </div>
+              
+              <button class="btn btn-success w-100" 
+                      (click)="checkout()"
+                      [disabled]="!isAuthenticated">
+                <i class="fas fa-credit-card"></i>
+                {{ isAuthenticated ? 'Proceed to Checkout' : 'Login to Checkout' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<button class="btn btn-add">Add</button>
-<button class="btn btn-complete">Complete</button>
-<button class="btn btn-remove">Remove</button>
-<button class="btn btn-update-price">Update Price</button>
-<button class="btn btn-remove-quantity">Remove Quantity</button>
 

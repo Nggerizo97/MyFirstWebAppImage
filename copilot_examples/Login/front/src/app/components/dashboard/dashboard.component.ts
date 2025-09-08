@@ -1,98 +1,151 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
+import { ProductService, Product } from 'src/app/services/product.service';
+import { AuthService } from 'src/app/services/auth.service';
+
+interface CartItem {
+  productId: number;
+  name: string;
+  imageUrl: string;
+  customPrice: number;
+  quantity: number;
+}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
-quantityToRemove: any;
-newPrice: any;
-  constructor(private toastr: ToastrService) { }
+export class DashboardComponent implements OnInit {
+  images: Product[] = [];
+  cartItems: CartItem[] = [];
+  loading: boolean = true;
+  isAuthenticated: boolean = false;
 
-  images = [
-    { url: '../../../assets/img/img1.jpg', name: 'Imagen 1', customPrice: 1, isAddedToCart: true },
-    { url: '../../../assets/img/img2.jpg', name: 'Imagen 2', customPrice: 1, isAddedToCart: true },
-    // Agrega más imágenes aquí
-  ];
+  constructor(
+    private toastr: ToastrService,
+    private productService: ProductService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
-  cartItems: { name: string; customPrice: number; quantity: number; totalPrice: number; isAddedToCart: boolean; }[] = [];
-
-  selectImage(image: any) {
-    // Implementar lógica aquí
+  ngOnInit(): void {
+    this.isAuthenticated = this.authService.isAuthenticated();
+    this.loadProducts();
+    this.loadCart();
   }
 
-  addToCart(image: any) {
-    if (image.customPrice < 1) {
-      this.toastr.error("The price should be 1 dollar or more", "Error");}
-
-    if (image.customPrice >= 1) {
-      const existingImage = this.cartItems.find(item => item.name === image.name);
-      if (existingImage) {
-        existingImage.quantity += 1;
-        existingImage.totalPrice += image.customPrice;
-      } else {
-        this.cartItems.push({
-          ...image,
-          quantity: 1,
-          totalPrice: image.customPrice
-        });
-        image.isAddedToCart = true;
+  loadProducts(): void {
+    this.productService.getPublicProducts().subscribe({
+      next: (products) => {
+        this.images = products;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.toastr.error('Error loading images', 'Error');
+        this.loading = false;
       }
-    } else {
-      this.toastr.error("The price should be 1 dollar or more", "Error");
+    });
+  }
+
+  loadCart(): void {
+    const cart = localStorage.getItem('cart');
+    if (cart) {
+      this.cartItems = JSON.parse(cart);
     }
   }
 
-  getTotal() {
-    return this.cartItems.reduce((total, item) => total + item.totalPrice, 0);
+  saveCart(): void {
+    localStorage.setItem('cart', JSON.stringify(this.cartItems));
   }
 
-  getTotalQuantity() {
-    return this.cartItems.reduce((total, item) => total + item.quantity, 0);
-  }
-
-  removeFromCart(index: number) {
-    const image = this.images.find(img => img.name === this.cartItems[index].name);
-    if (image) {
-      image.isAddedToCart = false;
+  addToCart(image: Product, customPrice?: number): void {
+    if (!this.isAuthenticated) {
+      this.toastr.warning('Please login to add items to cart', 'Login Required');
+      this.router.navigate(['/login']);
+      return;
     }
+
+    const price = customPrice || image.price;
+    
+    if (price < 1) {
+      this.toastr.error('The price should be $1 or more', 'Error');
+      return;
+    }
+
+    // Check if item already in cart (for images, each should be unique)
+    const existingItem = this.cartItems.find(item => item.productId === image.id);
+    if (existingItem) {
+      this.toastr.warning('Image already in cart', 'Warning');
+      return;
+    }
+
+    const cartItem: CartItem = {
+      productId: image.id!,
+      name: image.name,
+      imageUrl: image.imageUrl,
+      customPrice: price,
+      quantity: 1 // Always 1 for images
+    };
+
+    this.cartItems.push(cartItem);
+    this.saveCart();
+    this.toastr.success('Image added to cart', 'Success');
+  }
+
+  removeFromCart(index: number): void {
     this.cartItems.splice(index, 1);
+    this.saveCart();
+    this.toastr.info('Item removed from cart', 'Info');
   }
 
-  updatePrice(image: any, newPrice: number) {
-    if (newPrice < 0) {
-    this.toastr.error("Price cannot be negative", "Error");
-  } else {
-    image.customPrice = newPrice;
-  }
+  getTotal(): number {
+    return this.cartItems.reduce((total, item) => total + (item.customPrice * item.quantity), 0);
   }
 
-  removeQuantity(image: any, quantityToRemove: number) {
-    const cartItem = this.cartItems.find(item => item.name === image.name);
-    if (!Number.isInteger(quantityToRemove)) {
-      this.toastr.error("You can only remove integer quantities", "Error");
-    } else if (quantityToRemove < 0) {
-      this.toastr.error("Cannot remove negative quantity", "Error");
-    } else {
-      const cartItem = this.cartItems.find(item => item.name === image.name);
-      if (cartItem) {
-        if (cartItem.quantity < quantityToRemove) {
-          this.toastr.error("You can't remove more items than exist in the cart", "Error");
-        } else {
-          cartItem.quantity -= quantityToRemove;
-          if (cartItem.quantity === 0) {
-            const index = this.cartItems.indexOf(cartItem);
-            this.removeFromCart(index);
-          } else {
-            cartItem.totalPrice = cartItem.quantity * cartItem.customPrice;
-          }
-        }
-      }
+  getTotalQuantity(): number {
+    return this.cartItems.length; // For images, it's always the count
+  }
+
+  checkout(): void {
+    if (!this.isAuthenticated) {
+      this.toastr.warning('Please login to checkout', 'Login Required');
+      this.router.navigate(['/login']);
+      return;
     }
+
+    if (this.cartItems.length === 0) {
+      this.toastr.warning('Your cart is empty', 'Warning');
+      return;
+    }
+
+    // Process each item as a separate order
+    let completedOrders = 0;
+    const totalOrders = this.cartItems.length;
+
+    this.cartItems.forEach((item, index) => {
+      this.productService.createOrder(item.productId, item.customPrice, 'test').subscribe({
+        next: (response) => {
+          completedOrders++;
+          
+          if (completedOrders === totalOrders) {
+            this.toastr.success('All orders created successfully!', 'Success');
+            this.cartItems = [];
+            this.saveCart();
+          }
+        },
+        error: (error) => {
+          console.error('Error creating order:', error);
+          this.toastr.error(`Error creating order for ${item.name}`, 'Error');
+        }
+      });
+    });
   }
-  checkout() {
-    // Implementar lógica aquí
+
+  selectImage(image: Product): void {
+    // Could implement image preview modal here
+    this.toastr.info(`Selected: ${image.name}`, 'Info');
   }
 }

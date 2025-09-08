@@ -12,8 +12,26 @@ exports.Product = sequelize.define('product', {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false
     },
+    description: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: true
+    },
     price: {
         type: sequelize_1.DataTypes.FLOAT,
         allowNull: false
+    },
+    imageUrl: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false
+    },
+    category: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
+        defaultValue: 'photography'
+    },
+    available: {
+        type: sequelize_1.DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     }
 });

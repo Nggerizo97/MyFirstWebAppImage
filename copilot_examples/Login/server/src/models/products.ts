@@ -11,10 +11,27 @@ export const Product = sequelize.define('product', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
     price: {
         type: DataTypes.FLOAT,
         allowNull: false
-    }   
-    
+    },
+    imageUrl: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    category: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: 'photography'
+    },
+    available: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    }
 });
 

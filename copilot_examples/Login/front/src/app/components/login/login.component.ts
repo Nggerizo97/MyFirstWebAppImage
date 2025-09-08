@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { User } from 'src/app/interfaces/user';
 import { UserService } from 'src/app/services/user.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { ErrorService } from 'src/app/services/error.service';
 
 @Component({
@@ -21,6 +22,7 @@ export class LoginComponent implements OnInit {
     private route:ActivatedRoute,
     private router:Router,
     private _userService: UserService,
+    private _authService: AuthService,
     private _errorService: ErrorService
   ) { 
     // Constructor logic here
@@ -43,11 +45,11 @@ export class LoginComponent implements OnInit {
     this._userService.login(user).subscribe({
       next: (token) => {
         console.log(token);
-        localStorage.setItem('token', token);
+        this._authService.setToken(token);
         this.loading = false;
         console.log("User login successfully");
         this.toastr.success("User login successfully", "Success")
-        this.router.navigate(['/dashboard'])},
+        this.router.navigate(['/gallery'])},
       error: (events:HttpErrorResponse) => {
         this.loading = false
         this._errorService.msjError(events)

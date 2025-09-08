@@ -9,10 +9,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProduct = void 0;
+exports.getProductById = exports.getPublicProducts = exports.getProduct = void 0;
 const products_1 = require("../models/products");
 const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listproducts = yield products_1.Product.findAll();
     res.json(listproducts);
 });
 exports.getProduct = getProduct;
+const getPublicProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const listproducts = yield products_1.Product.findAll({
+            where: { available: true },
+            order: [['createdAt', 'DESC']]
+        });
+        res.json(listproducts);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: 'Error fetching products',
+            error
+        });
+    }
+});
+exports.getPublicProducts = getPublicProducts;
+const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const product = yield products_1.Product.findByPk(id);
+        if (!product) {
+            return res.status(404).json({ msg: 'Product not found' });
+        }
+        res.json(product);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: 'Error fetching product',
+            error
+        });
+    }
+});
+exports.getProductById = getProductById;

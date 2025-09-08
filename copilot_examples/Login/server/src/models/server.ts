@@ -1,10 +1,12 @@
 import express from 'express';
 import routesProduct from '../routes/product';
 import routesUsers from '../routes/user';
+import routesOrder from '../routes/order';
 import { Request, Response, NextFunction } from 'express';
 import  cors  from 'cors';
 import { Product } from './products';
 import { User } from './user';
+import { Order } from './order';
 
 
 class Server {
@@ -29,6 +31,7 @@ class Server {
         });
         this.app.use('/api/user', routesUsers);
         this.app.use('/api/product', routesProduct);
+        this.app.use('/api/order', routesOrder);
         
     }
 
@@ -49,8 +52,15 @@ class Server {
 
 
     db(){
-        Product.sync({ force: false });
         User.sync({ force: false });
+        Product.sync({ force: false });
+        Order.sync({ force: false });
+        
+        // Seed sample data
+        setTimeout(async () => {
+            const { seedProducts } = await import('../utils/seedData');
+            await seedProducts();
+        }, 2000);
     }
       
 }

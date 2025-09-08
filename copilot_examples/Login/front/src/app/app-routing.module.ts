@@ -5,11 +5,12 @@ import { SignInComponent } from './components/sign-in/sign-in.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 const routes: Routes = [
-  { path:'', redirectTo: 'login', pathMatch:'full' },
+  { path:'', redirectTo: 'gallery', pathMatch:'full' },
+  { path:'gallery', component: DashboardComponent },
   { path:'login', component: LoginComponent },
   { path:'singIn', component: SignInComponent },
   { path:'dashboard', component: DashboardComponent },
-  { path:'**', redirectTo: 'login', pathMatch:'full' }
+  { path:'**', redirectTo: 'gallery', pathMatch:'full' }
 ];
 
 @NgModule({

@@ -8,4 +8,6 @@ const product_1 = require("../controllers/product");
 const validateToken_1 = __importDefault(require("./validateToken"));
 const router = (0, express_1.Router)();
 router.get('/', validateToken_1.default, product_1.getProduct);
+router.get('/public', product_1.getPublicProducts); // Public route for gallery
+router.get('/:id', product_1.getProductById); // Public route for individual product
 exports.default = router;

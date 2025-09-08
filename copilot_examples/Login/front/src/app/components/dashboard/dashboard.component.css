@@ -1,123 +1,71 @@
-/* CSS Variables */
-:root {
-  --primary-color: #007BFF;
-  --primary-hover-color: #0056b3;
-  --secondary-color: #dc3545;
-  --secondary-hover-color: #c82333;
+.image-preview {
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
-/* General Styles */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
+.image-preview:hover {
+  transform: scale(1.05);
+}
+
+.cart-item {
+  transition: background-color 0.3s ease;
+}
+
+.cart-item:hover {
+  background-color: #f8f9fa;
+}
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.sticky-top {
+  position: sticky;
+  top: 20px;
+}
+
+@media (max-width: 768px) {
+  .sticky-top {
+    position: relative;
+    top: 0;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(45deg, #0056b3, #004085);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: linear-gradient(45deg, #28a745, #1e7e34);
+  border: none;
+}
+
+.btn-success:hover {
+  background: linear-gradient(45deg, #1e7e34, #155724);
+}
+
+.alert-info {
+  background: linear-gradient(45deg, #d1ecf1, #bee5eb);
+  border: 1px solid #b8daff;
+}
+
+.text-success {
+  color: #28a745 !important;
 }
 
 .container-fluid {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 1200px; /* Limit the width of the container */
-  margin: auto; /* Center the container */
-}
-
-h3 {
-  color: #333;
-  font-size: 1.5em; /* Increase the font size */
-}
-
-.image-catalog {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-}
-
-.image-item {
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 200px;
-  text-align: center;
-  transition: box-shadow 0.3s; /* Add transition for hover effect */
-}
-
-.image-item:hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Add hover effect */
-}
-
-.image-item img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-.image-item input {
-  width: 120px;
-  padding: 5px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  text-align: center;
-}
-
-/* General button styles */
-.btn {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn:hover {
-  background-color: var(--primary-hover-color);
-}
-
-/* Specific button styles */
-.btn-remove {
-  background-color: var(--secondary-color);
-}
-
-.btn-remove:hover {
-  background-color: var(--secondary-hover-color);
-}
-
-.shopping-cart {
-  margin-top: 40px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 80%;
-  text-align: center;
-}
-
-.shopping-cart h2 {
-  margin-bottom: 20px;
-}
-
-.shopping-cart ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.shopping-cart li {
-  background-color: #f9f9f9;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
 }
